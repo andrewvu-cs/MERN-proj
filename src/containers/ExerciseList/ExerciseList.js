@@ -1,0 +1,60 @@
+import React, { Component } from 'react';
+import axios from 'axios';
+import Exercise from '../../components/Exercise/Exercise';
+
+class exerciseList extends Component {
+
+    state = { exercises: [] }
+
+    componentDidMount(){
+        axios.get('http://localhost:5000/exercises/')
+            .then(response => {
+                this.setState({ exercises: response.data });
+                console.log(response.data)
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }
+
+    deleteExercise = (id) => {
+        axios.delete('http://localhost:5000/exercises/' + id)
+            .then(res => console.log(res.data))
+        this.setState({
+            // _id mongoDB's id parameter
+            exercises: this.state.exercises.filter(el => el._id !== id)
+        })
+    }
+
+    exerciseList = () => {
+        console.log(this.state.exercises);
+        return this.state.exercises.map(currentExercise => {
+            return <Exercise exercise={currentExercise} deleteExercise={this.deleteExercise} key={currentExercise._id}/>
+        })
+    }
+
+
+    render(){
+        return(
+            <div>
+                <h3>Logged Exercises</h3>
+                <table className="table">
+                    <thead className="thead-light">
+                        <tr>
+                            <th>Username</th>
+                            <th>Description</th>
+                            <th>Duration</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        { this.exerciseList() }
+                    </tbody>
+                </table>
+            </div>
+        )
+    }
+}
+
+export default exerciseList;
